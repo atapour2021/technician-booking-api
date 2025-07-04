@@ -13,8 +13,8 @@ export class AuthController {
     schema: {
       type: 'object',
       properties: {
-        email: { type: 'string', example: 'atapour2010@gmail.com' },
-        password: { type: 'string', example: 'kia@123' },
+        email: { type: 'string', example: 'c1@gmail.com' },
+        password: { type: 'string', example: '123' },
       },
     },
   })
