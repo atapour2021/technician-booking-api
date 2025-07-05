@@ -1,6 +1,8 @@
-import { Controller, Post, Body, UnauthorizedException } from '@nestjs/common';
-import { ApiTags, ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Body, Controller, Post } from '@nestjs/common';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
+import { LoginDto } from './dto/login.dto';
+import { RegisterDto } from './dto/register.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -9,20 +11,13 @@ export class AuthController {
 
   @Post('login')
   @ApiOperation({ summary: 'User login and get JWT token' })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        email: { type: 'string', example: 'c1@gmail.com' },
-        password: { type: 'string', example: '123' },
-      },
-    },
-  })
-  @ApiResponse({ status: 200, description: 'Login successful, token returned' })
-  @ApiResponse({ status: 401, description: 'Invalid credentials' })
-  async login(@Body() body: { email: string; password: string }) {
-    const user = await this.authService.validateUser(body.email, body.password);
-    if (!user) throw new UnauthorizedException('Invalid credentials');
-    return this.authService.login(user);
+  async login(@Body() body: LoginDto) {
+    return this.authService.login(body);
+  }
+
+  @Post('register')
+  @ApiOperation({ summary: 'User login and get JWT token' })
+  async register(@Body() body: RegisterDto) {
+    return this.authService.register(body);
   }
 }
