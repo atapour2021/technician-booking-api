@@ -49,7 +49,7 @@ export class BookingsController {
   @Roles('admin')
   @ApiOperation({ summary: 'Update booking status (admin only)' })
   updateStatus(@Param('id') id: string, @Body() body: UpdateBookingStatusDto) {
-    return this.bookingsService.updateStatus(+id, body.status as BookingStatus);
+    return this.bookingsService.updateStatus(+id, body.status);
   }
 
   @Patch(':id/technician')
