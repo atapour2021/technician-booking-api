@@ -22,6 +22,10 @@ export class UsersService {
     return this.userRepo.findOne({ where: { id } });
   }
 
+  async updateUser(id: number, data: Partial<User>) {
+    await this.userRepo.update({ id }, data);
+  }
+
   async create(userData: Partial<User>): Promise<User> {
     const user = this.userRepo.create(userData);
     return this.userRepo.save(user);
