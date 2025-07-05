@@ -10,5 +10,6 @@ import { BookingsService } from './bookings.service';
   imports: [TypeOrmModule.forFeature([Booking]), UsersModule, ServicesModule],
   providers: [BookingsService],
   controllers: [BookingsController],
+  exports: [BookingsService],
 })
 export class BookingsModule {}

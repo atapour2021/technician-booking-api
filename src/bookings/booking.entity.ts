@@ -17,6 +17,11 @@ export enum BookingStatus {
   DONE = 'done',
 }
 
+export enum PaymentStatus {
+  UNPAID = 'unpaid',
+  PAID = 'paid',
+}
+
 @Entity()
 export class Booking {
   @ApiProperty()
@@ -62,4 +67,12 @@ export class Booking {
   @Column({ type: 'text', nullable: true })
   @ApiProperty({ required: false })
   comment: string | null;
+
+  @Column({
+    type: 'enum',
+    enum: PaymentStatus,
+    default: PaymentStatus.UNPAID,
+  })
+  @ApiProperty({ enum: PaymentStatus })
+  paymentStatus: PaymentStatus;
 }

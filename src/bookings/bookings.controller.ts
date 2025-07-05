@@ -18,6 +18,7 @@ import { CreateBookingDto } from './dto/create-booking.dto';
 import { UpdateBookingStatusDto } from './dto/update-booking-status.dto';
 import { AssignTechnicianDto } from './dto/assign-technician.dto';
 import { RateBookingDto } from './dto/rate-booking.dto';
+import { PayBookingDto } from './dto/pay-booking.dto';
 
 @ApiTags('Bookings')
 @Controller('bookings')
@@ -101,6 +102,23 @@ export class BookingsController {
       req.user.userId,
       dto.rating,
       dto.comment,
+    );
+  }
+
+  @Patch(':id/pay')
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('customer')
+  @ApiOperation({ summary: 'Pay for a booking (mock)' })
+  payBooking(
+    @Param('id') id: string,
+    @Body() dto: PayBookingDto,
+    @Request() req,
+  ) {
+    return this.bookingsService.payForBooking(
+      +id,
+      req.user.userId,
+      dto.paymentReference,
     );
   }
 }

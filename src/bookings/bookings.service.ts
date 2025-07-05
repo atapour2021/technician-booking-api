@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Booking, BookingStatus } from './booking.entity';
+import { Booking, BookingStatus, PaymentStatus } from './booking.entity';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { UsersService } from '../users/users.service';
 import { ServicesService } from '../services/services.service';
@@ -121,6 +121,49 @@ export class BookingsService {
 
     booking.rating = rating;
     booking.comment = comment ? comment : null;
+    return this.bookingRepo.save(booking);
+  }
+
+  async payForBooking(
+    bookingId: number,
+    userId: number,
+    paymentReference: string,
+  ) {
+    const booking = await this.bookingRepo.findOne({
+      where: { id: bookingId },
+      relations: ['customer'],
+    });
+
+    if (!booking) throw new NotFoundException('Booking not found');
+    if (booking.customer.id !== userId) {
+      throw new ForbiddenException('This booking is not yours');
+    }
+    if (booking.paymentStatus === PaymentStatus.PAID) {
+      throw new BadRequestException('Booking already paid');
+    }
+
+    // fake validation of paymentReference here if needed
+
+    booking.paymentStatus = PaymentStatus.PAID;
+    // you can also save the reference if you want
+    return this.bookingRepo.save(booking);
+  }
+
+  async findById(id: number) {
+    return this.bookingRepo.findOne({
+      where: { id },
+      relations: ['customer', 'service', 'technician'],
+    });
+  }
+
+  async markAsPaid(bookingId: number) {
+    const booking = await this.bookingRepo.findOneBy({ id: bookingId });
+
+    if (!booking) {
+      throw new NotFoundException('Booking not found');
+    }
+
+    booking.paymentStatus = PaymentStatus.PAID;
     return this.bookingRepo.save(booking);
   }
 }
