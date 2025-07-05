@@ -81,10 +81,13 @@ export class PaymentsController {
     const result = await this.paymentsService.verifyPayment(authority, amount);
 
     if (result.code === 100) {
-      await this.bookingsService.markAsPaid(+bookingId);
+      await this.bookingsService.markAsPaid(
+        +bookingId,
+        authority,
+        result.ref_id.toString(),
+        result.card_pan,
+      );
       return res.redirect('http://localhost:4200/payment-success');
-    } else {
-      return res.status(400).send('پرداخت ناموفق بود');
     }
   }
 }

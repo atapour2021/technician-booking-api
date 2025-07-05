@@ -10,6 +10,7 @@ import { Booking, BookingStatus, PaymentStatus } from './booking.entity';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { UsersService } from '../users/users.service';
 import { ServicesService } from '../services/services.service';
+import { FilterBookingsDto } from './dto/filter-bookings.dto';
 
 @Injectable()
 export class BookingsService {
@@ -156,14 +157,96 @@ export class BookingsService {
     });
   }
 
-  async markAsPaid(bookingId: number) {
+  async markAsPaid(
+    bookingId: number,
+    authority: string,
+    refId: string,
+    cardPan: string,
+  ) {
     const booking = await this.bookingRepo.findOneBy({ id: bookingId });
-
-    if (!booking) {
-      throw new NotFoundException('Booking not found');
-    }
+    if (!booking) throw new NotFoundException('Booking not found');
 
     booking.paymentStatus = PaymentStatus.PAID;
+    booking.paymentAuthority = authority;
+    booking.paymentRefId = refId;
+    booking.paymentCardPan = cardPan;
+
     return this.bookingRepo.save(booking);
+  }
+
+  async getBookingPaymentInfo(bookingId: number) {
+    const booking = await this.bookingRepo.findOne({
+      where: { id: bookingId },
+      relations: ['customer', 'service', 'technician'],
+    });
+
+    if (!booking) throw new NotFoundException('Booking not found');
+
+    return {
+      bookingId: booking.id,
+      customer: {
+        id: booking.customer.id,
+        name: booking.customer.fullName,
+        email: booking.customer.email,
+      },
+      technician: booking.technician
+        ? {
+            id: booking.technician.id,
+            name: booking.technician.fullName,
+          }
+        : null,
+      service: {
+        id: booking.service.id,
+        name: booking.service.name,
+        basePrice: booking.service.basePrice,
+      },
+      payment: {
+        status: booking.paymentStatus,
+        authority: booking.paymentAuthority,
+        refId: booking.paymentRefId,
+        cardPan: booking.paymentCardPan,
+      },
+    };
+  }
+
+  async getFilteredPayments(filter: FilterBookingsDto) {
+    const qb = this.bookingRepo
+      .createQueryBuilder('booking')
+      .leftJoinAndSelect('booking.customer', 'customer')
+      .leftJoinAndSelect('booking.technician', 'technician')
+      .leftJoinAndSelect('booking.service', 'service');
+
+    if (filter.paymentStatus) {
+      qb.andWhere('booking.paymentStatus = :status', {
+        status: filter.paymentStatus,
+      });
+    }
+
+    if (filter.technicianId) {
+      qb.andWhere('technician.id = :techId', { techId: filter.technicianId });
+    }
+
+    if (filter.startDate) {
+      qb.andWhere('booking.createdAt >= :startDate', {
+        startDate: filter.startDate,
+      });
+    }
+
+    if (filter.endDate) {
+      qb.andWhere('booking.createdAt <= :endDate', { endDate: filter.endDate });
+    }
+
+    qb.skip(filter.skip)
+      .take(filter.limit)
+      .orderBy('booking.createdAt', 'DESC');
+
+    const [items, total] = await qb.getManyAndCount();
+
+    return {
+      total,
+      page: filter.page,
+      limit: filter.limit,
+      data: items,
+    };
   }
 }

@@ -5,6 +5,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -19,6 +20,8 @@ import { UpdateBookingStatusDto } from './dto/update-booking-status.dto';
 import { AssignTechnicianDto } from './dto/assign-technician.dto';
 import { RateBookingDto } from './dto/rate-booking.dto';
 import { PayBookingDto } from './dto/pay-booking.dto';
+import { FilterBookingsDto } from './dto/filter-bookings.dto';
+import { FilterQuery } from 'src/common';
 
 @ApiTags('Bookings')
 @Controller('bookings')
@@ -120,5 +123,23 @@ export class BookingsController {
       req.user.userId,
       dto.paymentReference,
     );
+  }
+
+  @Get('admin/bookings/:id/payment')
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
+  @ApiOperation({ summary: 'Get payment info for a booking (admin only)' })
+  async getBookingPaymentInfo(@Param('id') id: string) {
+    return this.bookingsService.getBookingPaymentInfo(+id);
+  }
+
+  @Get('admin/bookings/payments')
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
+  @ApiOperation({ summary: 'Admin: List payments with filters and pagination' })
+  async getPayments(@FilterQuery(FilterBookingsDto) filter: FilterBookingsDto) {
+    return this.bookingsService.getFilteredPayments(filter);
   }
 }

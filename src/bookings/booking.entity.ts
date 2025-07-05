@@ -75,4 +75,16 @@ export class Booking {
   })
   @ApiProperty({ enum: PaymentStatus })
   paymentStatus: PaymentStatus;
+
+  @Column({ nullable: true })
+  @ApiProperty({ required: false })
+  paymentRefId?: string;
+
+  @Column({ nullable: true })
+  @ApiProperty({ required: false })
+  paymentCardPan?: string;
+
+  @Column({ nullable: true })
+  @ApiProperty({ required: false })
+  paymentAuthority?: string;
 }
