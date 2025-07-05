@@ -1,19 +1,20 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
-  ManyToOne,
   CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { User } from '../users/user.entity';
 import { Service } from '../services/service.entity';
-import { ApiProperty } from '@nestjs/swagger';
+import { User } from '../users/user.entity';
 
 export enum BookingStatus {
   PENDING = 'pending',
   CONFIRMED = 'confirmed',
   CANCELED = 'canceled',
+  DONE = 'done',
 }
 
 @Entity()
@@ -49,4 +50,16 @@ export class Booking {
   @ApiProperty()
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @ManyToOne(() => User, { eager: true, nullable: true })
+  @ApiProperty({ type: () => User, required: false })
+  technician: User;
+
+  @Column({ type: 'int', nullable: true })
+  @ApiProperty({ required: false })
+  rating: number;
+
+  @Column({ type: 'text', nullable: true })
+  @ApiProperty({ required: false })
+  comment: string | null;
 }
