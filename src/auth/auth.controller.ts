@@ -1,13 +1,22 @@
-import { Body, Controller, Post } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { RefreshDto } from './dto/refresh.dto';
+import { LogoutDto } from './dto/logout.dto';
+import { CurrentUser, CurrentUserDto } from 'src/common';
+import { JwtAuthGuard } from './jwt-auth.guard';
+import { UsersService } from 'src/users/users.service';
+import { User } from 'src/users/user.entity';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private usersService: UsersService,
+  ) {}
 
   @Post('login')
   @ApiOperation({ summary: 'User login and get JWT token' })
@@ -17,7 +26,7 @@ export class AuthController {
 
   @Post('logout')
   @ApiOperation({ summary: 'User logout' })
-  async logout(@Body() body: { userId: number }) {
+  async logout(@Body() body: LogoutDto) {
     return this.authService.logout(body.userId);
   }
 
@@ -29,10 +38,17 @@ export class AuthController {
 
   @Post('refresh')
   @ApiOperation({ summary: 'User refresh and get JWT token' })
-  async refresh(@Body() body: { userId: number; refresh_token: string }) {
+  async refresh(@Body() body: RefreshDto) {
     return await this.authService.refreshTokens(
       body.userId,
       body.refresh_token,
     );
+  }
+
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard)
+  @Get('profile')
+  async getProfile(@CurrentUser() user: CurrentUserDto) {
+    return await this.usersService.findById(user.userId);
   }
 }
