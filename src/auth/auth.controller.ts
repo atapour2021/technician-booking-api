@@ -1,22 +1,15 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Post } from '@nestjs/common';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
-import { RegisterDto } from './dto/register.dto';
-import { RefreshDto } from './dto/refresh.dto';
 import { LogoutDto } from './dto/logout.dto';
-import { CurrentUser, CurrentUserDto } from 'src/common';
-import { JwtAuthGuard } from './jwt-auth.guard';
-import { UsersService } from 'src/users/users.service';
-import { User } from 'src/users/user.entity';
+import { RefreshDto } from './dto/refresh.dto';
+import { RegisterDto } from './dto/register.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private authService: AuthService,
-    private usersService: UsersService,
-  ) {}
+  constructor(private authService: AuthService) {}
 
   @Post('login')
   @ApiOperation({ summary: 'User login and get JWT token' })
@@ -43,12 +36,5 @@ export class AuthController {
       body.userId,
       body.refresh_token,
     );
-  }
-
-  @ApiBearerAuth('access-token')
-  @UseGuards(JwtAuthGuard)
-  @Get('profile')
-  async getProfile(@CurrentUser() user: CurrentUserDto) {
-    return await this.usersService.findById(user.userId);
   }
 }
