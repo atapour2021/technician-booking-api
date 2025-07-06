@@ -50,4 +50,7 @@ export class User {
 
   @Column({ nullable: true })
   refreshToken?: string;
+
+  @Column({ nullable: true })
+  avatarUrl?: string;
 }

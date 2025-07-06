@@ -3,7 +3,7 @@ import { IsEmail, IsNotEmpty } from 'class-validator';
 
 export class LoginDto {
   @IsEmail()
-  @ApiProperty({ default: 'admin@gmail.com' })
+  @ApiProperty({ default: 'test12@gmail.com' })
   email: string;
 
   @IsNotEmpty()
