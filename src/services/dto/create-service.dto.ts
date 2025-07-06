@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional, IsInt } from 'class-validator';
+import { Category } from 'src/category/category.entity';
 
 export class CreateServiceDto {
   @ApiProperty()
@@ -12,7 +13,7 @@ export class CreateServiceDto {
 
   @ApiProperty()
   @IsNotEmpty()
-  category: string;
+  categoryId: number;
 
   @ApiProperty()
   @IsInt()

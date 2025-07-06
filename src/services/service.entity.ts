@@ -4,8 +4,10 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
+import { Category } from 'src/category/category.entity';
 
 @Entity()
 export class Service {
@@ -22,10 +24,6 @@ export class Service {
   description: string;
 
   @ApiProperty()
-  @Column()
-  category: string;
-
-  @ApiProperty()
   @Column('int')
   basePrice: number;
 
@@ -36,4 +34,8 @@ export class Service {
   @ApiProperty()
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @ApiProperty()
+  @ManyToOne(() => Category, (category) => category.services, { eager: true })
+  category: Category;
 }
