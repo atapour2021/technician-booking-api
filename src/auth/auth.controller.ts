@@ -24,7 +24,7 @@ export class AuthController {
   }
 
   @Post('register')
-  @ApiOperation({ summary: 'User login and get JWT token' })
+  @ApiOperation({ summary: 'User register and get JWT token' })
   async register(@Body() body: RegisterDto) {
     return await this.authService.register(body);
   }

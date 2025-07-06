@@ -9,7 +9,12 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { RolesGuard } from '../common/guards/roles.guard';
@@ -131,15 +136,18 @@ export class BookingsController {
   @Roles('admin')
   @ApiOperation({ summary: 'Get payment info for a booking (admin only)' })
   async getBookingPaymentInfo(@Param('id') id: string) {
-    return this.bookingsService.getBookingPaymentInfo(+id);
+    return await this.bookingsService.getBookingPaymentInfo(+id);
   }
 
   @Get('admin/bookings/payments')
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
+  @ApiQuery({
+    type: FilterBookingsDto,
+  })
   @ApiOperation({ summary: 'Admin: List payments with filters and pagination' })
   async getPayments(@FilterQuery(FilterBookingsDto) filter: FilterBookingsDto) {
-    return this.bookingsService.getFilteredPayments(filter);
+    return await this.bookingsService.getFilteredPayments(filter);
   }
 }

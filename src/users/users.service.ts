@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
+import { FilterUserDto } from './dto/filter.user.dto';
 
 @Injectable()
 export class UsersService {
@@ -29,5 +30,36 @@ export class UsersService {
   async create(userData: Partial<User>): Promise<User> {
     const user = this.userRepo.create(userData);
     return this.userRepo.save(user);
+  }
+
+  async findAllWithFilter(options: FilterUserDto) {
+    const qb = this.userRepo.createQueryBuilder('user');
+
+    if (options.role) {
+      qb.andWhere('user.role = :role', { role: options.role });
+    }
+
+    if (options.search) {
+      qb.andWhere('user.name ILIKE :search OR user.email ILIKE :search', {
+        search: `%${options.search}%`,
+      });
+    }
+
+    qb.skip((options.page - 1) * options.limit)
+      .take(options.limit)
+      .orderBy('user.id', 'DESC');
+
+    const [data, total] = await qb.getManyAndCount();
+    return {
+      data,
+      total,
+      page: options.page,
+      limit: options.limit,
+    };
+  }
+
+  async deleteUser(id: number) {
+    await this.userRepo.delete(id);
+    return { success: true };
   }
 }
