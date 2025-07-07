@@ -1,10 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Service } from './service.entity';
-import { CreateServiceDto } from './dto/create-service.dto';
+import { Booking } from 'src/bookings/booking.entity';
 import { CategoryService } from 'src/category/category.service';
-import { UpdateCategoryDto } from 'src/category/dto/update.category.dto';
+import { Repository } from 'typeorm';
+import { CreateServiceDto } from './dto/create-service.dto';
+import { Service } from './service.entity';
 
 @Injectable()
 export class ServicesService {
@@ -12,6 +16,8 @@ export class ServicesService {
     @InjectRepository(Service)
     private serviceRepo: Repository<Service>,
     private categoryService: CategoryService,
+    @InjectRepository(Booking)
+    private bookingRepo: Repository<Booking>,
   ) {}
 
   async findAll(): Promise<Service[]> {
@@ -27,17 +33,26 @@ export class ServicesService {
     if (!category) throw new NotFoundException('Category not found');
 
     const service = this.serviceRepo.create({ ...dto, category });
-
-    const categoryData = new UpdateCategoryDto();
-    categoryData.description = category.description;
-    categoryData.title = category.title;
-    categoryData.service = service;
-    await this.categoryService.update(category.id, categoryData);
-
     return await this.serviceRepo.save(service);
   }
 
-  async remove(id: number): Promise<void> {
-    await this.serviceRepo.delete(id);
+  async remove(id: number) {
+    const usedInBookings = await this.bookingRepo.count({
+      where: { service: { id } },
+    });
+
+    if (usedInBookings > 0) {
+      throw new BadRequestException(
+        'Cannot delete service. It is used in a booking.',
+      );
+    }
+
+    const service = await this.serviceRepo.findOneBy({ id });
+
+    if (!service) {
+      throw new NotFoundException('Service not found');
+    }
+
+    return await this.serviceRepo.remove(service);
   }
 }

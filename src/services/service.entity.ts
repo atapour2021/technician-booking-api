@@ -35,7 +35,7 @@ export class Service {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ApiProperty()
+  @ApiProperty({ type: () => Category })
   @ManyToOne(() => Category, (category) => category.services, { eager: true })
   category: Category;
 }

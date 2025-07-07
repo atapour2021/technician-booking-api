@@ -4,5 +4,5 @@ import { Service } from 'src/services/service.entity';
 
 export class UpdateCategoryDto extends CreateCategoryDtp {
   @ApiProperty()
-  service: Service;
+  services: Service[];
 }
