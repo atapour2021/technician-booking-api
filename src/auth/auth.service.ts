@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { OtpService } from 'src/otp/otp.service';
 import { User } from 'src/users/user.entity';
 import { UsersService } from '../users/users.service';
 import { LoginDto } from './dto/login.dto';
@@ -15,6 +16,7 @@ export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    private otpService: OtpService,
   ) {}
 
   async validateUser(email: string, pass: string): Promise<any> {
@@ -94,5 +96,25 @@ export class AuthService {
     return await this.usersService.updateUser(userId, {
       refreshToken: undefined,
     });
+  }
+
+  async sendOtp(phone: string): Promise<string> {
+    await this.otpService.generateOtp(phone);
+
+    return 'OTP sent successfully';
+  }
+
+  async verifyOtp(
+    phone: string,
+    code: string,
+  ): Promise<{ access_token: string }> {
+    const valid = await this.otpService.verifyOtp(phone, code);
+    if (!valid) throw new UnauthorizedException('Invalid or expired OTP');
+
+    const user = await this.usersService.findOrCreateByPhone(phone);
+    const payload = { sub: user.id, phone: user.phone };
+    const token = this.jwtService.sign(payload);
+
+    return { access_token: token };
   }
 }

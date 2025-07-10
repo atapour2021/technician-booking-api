@@ -62,4 +62,19 @@ export class UsersService {
     await this.userRepo.delete(id);
     return { success: true };
   }
+
+  async findByPhone(phone: string): Promise<User | null> {
+    return this.userRepo.findOne({ where: { phone } });
+  }
+
+  async createUserByPhone(phone: string): Promise<User> {
+    const user = this.userRepo.create({ phone });
+    return this.userRepo.save(user);
+  }
+
+  async findOrCreateByPhone(phone: string): Promise<User> {
+    const existing = await this.findByPhone(phone);
+    if (existing) return existing;
+    return this.createUserByPhone(phone);
+  }
 }

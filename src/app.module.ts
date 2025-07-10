@@ -7,6 +7,7 @@ import { BookingsModule } from './bookings/bookings.module';
 import { PaymentsModule } from './payments/payments.module';
 import { ProfileModule } from './profile/profile.module';
 import { CategoryModule } from './category/category.module';
+import { OtpModule } from './otp/otp.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { CategoryModule } from './category/category.module';
     PaymentsModule,
     ProfileModule,
     CategoryModule,
+    OtpModule,
   ],
   controllers: [],
   providers: [],

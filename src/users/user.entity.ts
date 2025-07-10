@@ -20,9 +20,6 @@ export class User {
   @Column()
   fullName: string;
 
-  @Column({ unique: true })
-  email: string;
-
   @Column()
   password: string;
 
@@ -33,8 +30,11 @@ export class User {
   })
   role: UserRole;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, unique: true })
   phone: string;
+
+  @Column({ nullable: true, unique: true })
+  email: string;
 
   @Column({ nullable: true })
   address: string;
