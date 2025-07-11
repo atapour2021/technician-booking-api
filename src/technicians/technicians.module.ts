@@ -15,5 +15,6 @@ import { User } from 'src/users/user.entity';
   ],
   providers: [TechniciansService],
   controllers: [TechniciansController],
+  exports: [TechniciansService],
 })
 export class TechniciansModule {}

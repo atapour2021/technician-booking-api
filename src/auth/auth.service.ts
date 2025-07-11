@@ -6,10 +6,12 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { OtpService } from 'src/otp/otp.service';
-import { User } from 'src/users/user.entity';
+import { User, UserRole } from 'src/users/user.entity';
 import { UsersService } from '../users/users.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { TechniciansService } from 'src/technicians/technicians.service';
+import { CreateTechnicianDto } from 'src/technicians/dto/create-technician.dto';
 
 @Injectable()
 export class AuthService {
@@ -17,6 +19,7 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
     private otpService: OtpService,
+    private techniciansService: TechniciansService,
   ) {}
 
   async validateUser(email: string, pass: string): Promise<any> {
@@ -34,17 +37,28 @@ export class AuthService {
     const hashed = await bcrypt.hash(dto.password, 10);
 
     const userData = new User();
-
     userData.email = dto.email;
     userData.fullName = dto.fullName;
     userData.role = dto.role;
     userData.password = hashed;
+    userData.isActive = true;
 
-    const user = await this.usersService.create(userData);
-    const tokens = await this.getTokens(user.id, user.role);
-    await this.updateRefreshToken(user.id, tokens.refresh_token);
-
-    return tokens;
+    if (userData.role === UserRole.TECHNICIAN) {
+      const technicianData = new CreateTechnicianDto();
+      technicianData.user = userData;
+      const technician = await this.techniciansService.create(technicianData);
+      const tokens = await this.getTokens(
+        technician.user.id,
+        technician.user.role,
+      );
+      await this.updateRefreshToken(technician.user.id, tokens.refresh_token);
+      return tokens;
+    } else {
+      const user = await this.usersService.create(userData);
+      const tokens = await this.getTokens(user.id, user.role);
+      await this.updateRefreshToken(user.id, tokens.refresh_token);
+      return tokens;
+    }
   }
 
   async login(dto: LoginDto) {

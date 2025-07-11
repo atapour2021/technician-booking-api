@@ -7,6 +7,9 @@ export class RegisterDto {
   @ApiProperty()
   email: string;
 
+  @ApiProperty()
+  phone: string;
+
   @IsNotEmpty()
   @ApiProperty()
   fullName: string;
