@@ -49,7 +49,7 @@ export class UsersController {
 
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin')
+  @Roles(UserRole.ADMIN)
   @Patch(':id/toggle-status')
   @ApiOperation({ summary: 'User toggle status' })
   async toggleStatus(@Param('id') id: string) {
@@ -64,7 +64,7 @@ export class UsersController {
 
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin')
+  @Roles(UserRole.ADMIN)
   @Delete(':id')
   @ApiOperation({ summary: 'Delete user' })
   async deleteUser(@Param('id') id: string) {
@@ -73,7 +73,7 @@ export class UsersController {
 
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin')
+  @Roles(UserRole.ADMIN)
   @Patch(':id/role')
   @ApiOperation({ summary: 'Change user role' })
   async changeRole(@Param('id') id: string, @Body() body: { role: UserRole }) {
@@ -82,7 +82,7 @@ export class UsersController {
 
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin')
+  @Roles(UserRole.ADMIN)
   @Get('admin/users')
   @ApiOperation({ summary: 'Admin: List users with filters and pagination' })
   @ApiQuery({

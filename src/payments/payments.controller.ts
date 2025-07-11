@@ -20,6 +20,7 @@ import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { BookingsService } from '../bookings/bookings.service';
 import { PaymentStatus } from '../bookings/booking.entity';
+import { UserRole } from 'src/users/user.entity';
 
 @ApiTags('Payments')
 @Controller('payments')
@@ -32,7 +33,7 @@ export class PaymentsController {
   @Post(':bookingId/initiate')
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('customer')
+  @Roles(UserRole.CUSTOMER)
   @ApiOperation({ summary: 'Initiate Zarinpal payment for a booking' })
   async initiate(
     @Param('bookingId') bookingId: string,

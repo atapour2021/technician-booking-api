@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Technician } from './technician.entity';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity()
 export class Skill {
@@ -7,7 +8,8 @@ export class Skill {
   id: number;
 
   @Column()
-  title: string; // مثلاً: "برق‌کاری"
+  @ApiProperty()
+  title: string;
 
   @ManyToOne(() => Technician, (technician) => technician.skills, {
     onDelete: 'CASCADE',

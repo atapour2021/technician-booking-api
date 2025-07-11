@@ -5,7 +5,6 @@ import {
   Param,
   Patch,
   Post,
-  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -15,18 +14,18 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
+import { FilterQuery } from 'src/common';
+import { UserRole } from 'src/users/user.entity';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { RolesGuard } from '../common/guards/roles.guard';
-import { BookingStatus } from './booking.entity';
 import { BookingsService } from './bookings.service';
-import { CreateBookingDto } from './dto/create-booking.dto';
-import { UpdateBookingStatusDto } from './dto/update-booking-status.dto';
 import { AssignTechnicianDto } from './dto/assign-technician.dto';
-import { RateBookingDto } from './dto/rate-booking.dto';
-import { PayBookingDto } from './dto/pay-booking.dto';
+import { CreateBookingDto } from './dto/create-booking.dto';
 import { FilterBookingsDto } from './dto/filter-bookings.dto';
-import { FilterQuery } from 'src/common';
+import { PayBookingDto } from './dto/pay-booking.dto';
+import { RateBookingDto } from './dto/rate-booking.dto';
+import { UpdateBookingStatusDto } from './dto/update-booking-status.dto';
 
 @ApiTags('Bookings')
 @Controller('bookings')
@@ -36,7 +35,7 @@ export class BookingsController {
   @Post()
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('customer')
+  @Roles(UserRole.CUSTOMER)
   @ApiOperation({ summary: 'Create a booking (customer only)' })
   create(@Body() dto: CreateBookingDto, @Request() req) {
     return this.bookingsService.create(req.user.userId, dto);
@@ -45,7 +44,7 @@ export class BookingsController {
   @Get()
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('customer', 'admin')
+  @Roles(UserRole.CUSTOMER, UserRole.ADMIN)
   @ApiOperation({ summary: 'Get current user bookings' })
   getMyBookings(@Request() req) {
     return this.bookingsService.findByCustomer(req.user.userId);
@@ -54,7 +53,7 @@ export class BookingsController {
   @Patch(':id/status')
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin')
+  @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Update booking status (admin only)' })
   updateStatus(@Param('id') id: string, @Body() body: UpdateBookingStatusDto) {
     return this.bookingsService.updateStatus(+id, body.status);
@@ -63,7 +62,7 @@ export class BookingsController {
   @Patch(':id/technician')
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin')
+  @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Assign technician to booking (admin only)' })
   assignTechnician(@Param('id') id: string, @Body() body: AssignTechnicianDto) {
     return this.bookingsService.assignTechnician(+id, body.technicianId);
@@ -72,7 +71,7 @@ export class BookingsController {
   @Get('technician/my')
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('technician')
+  @Roles(UserRole.TECHNICIAN)
   @ApiOperation({ summary: 'Get bookings assigned to logged-in technician' })
   getTechnicianBookings(@Request() req) {
     return this.bookingsService.findByTechnician(req.user.userId);
@@ -81,7 +80,7 @@ export class BookingsController {
   @Patch(':id/status/technician')
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('technician')
+  @Roles(UserRole.TECHNICIAN)
   @ApiOperation({ summary: 'Technician updates their own booking status' })
   updateStatusByTechnician(
     @Param('id') id: string,
@@ -98,7 +97,7 @@ export class BookingsController {
   @Patch(':id/rate')
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('customer')
+  @Roles(UserRole.CUSTOMER)
   @ApiOperation({ summary: 'Customer rates the booking after completion' })
   rateBooking(
     @Param('id') id: string,
@@ -116,7 +115,7 @@ export class BookingsController {
   @Patch(':id/pay')
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('customer')
+  @Roles(UserRole.CUSTOMER)
   @ApiOperation({ summary: 'Pay for a booking (mock)' })
   payBooking(
     @Param('id') id: string,
@@ -133,7 +132,7 @@ export class BookingsController {
   @Get('admin/bookings/:id/payment')
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin')
+  @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Get payment info for a booking (admin only)' })
   async getBookingPaymentInfo(@Param('id') id: string) {
     return await this.bookingsService.getBookingPaymentInfo(+id);
@@ -142,7 +141,7 @@ export class BookingsController {
   @Get('admin/bookings/payments')
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin')
+  @Roles(UserRole.ADMIN)
   @ApiQuery({
     type: FilterBookingsDto,
   })

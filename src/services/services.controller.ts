@@ -18,6 +18,7 @@ import {
 import { Service } from './service.entity';
 import { Roles, RolesGuard } from 'src/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { UserRole } from 'src/users/user.entity';
 
 @ApiTags('Services')
 @Controller('services')
@@ -41,7 +42,7 @@ export class ServicesController {
   @Post()
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin')
+  @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Create a new service' })
   @ApiResponse({ status: 201, type: Service })
   create(@Body() dto: CreateServiceDto) {
@@ -51,7 +52,7 @@ export class ServicesController {
   @Delete(':id')
   @ApiBearerAuth('access-token')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin')
+  @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Delete a service' })
   @ApiResponse({ status: 200, description: 'Service deleted' })
   remove(@Param('id') id: string) {

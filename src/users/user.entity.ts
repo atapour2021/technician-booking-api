@@ -1,8 +1,10 @@
+import { Technician } from 'src/technicians/entity/technician.entity';
 import {
-  Entity,
   Column,
-  PrimaryGeneratedColumn,
   CreateDateColumn,
+  Entity,
+  OneToOne,
+  PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
@@ -56,4 +58,7 @@ export class User {
 
   @Column({ nullable: true })
   avatarUrl?: string;
+
+  @OneToOne(() => Technician, (technician) => technician.user)
+  technician: Technician;
 }

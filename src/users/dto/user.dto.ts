@@ -1,10 +1,16 @@
-import { IsEmail, IsNotEmpty, MinLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateUserDto {
-  @ApiProperty({ required: false })
+  @ApiProperty({ required: true })
   @IsNotEmpty()
+  @IsString()
   fullName: string;
+
+  @ApiProperty({ required: true })
+  @IsNotEmpty()
+  @IsString()
+  phone: string;
 
   @ApiProperty({ required: false })
   @IsEmail()

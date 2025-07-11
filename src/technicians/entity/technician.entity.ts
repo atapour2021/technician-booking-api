@@ -1,4 +1,11 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { User } from 'src/users/user.entity';
+import {
+  Entity,
+  JoinColumn,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Document } from './document.entity';
 import { ServiceArea } from './service-area.entity';
 import { Skill } from './skill.entity';
@@ -8,24 +15,16 @@ export class Technician {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  fullName: string;
+  @JoinColumn()
+  @OneToOne(() => User, (user) => user.id, { eager: true })
+  user: User;
 
-  @Column({ unique: true })
-  phone: string;
-
-  @Column({ unique: true })
-  email: string;
-
-  @Column({ nullable: true, unique: true })
-  avatarUrl: string;
-
-  @OneToMany(() => Skill, (skill) => skill.technician, { cascade: true })
+  @OneToMany(() => Skill, (skill) => skill.technician, { eager: true })
   skills: Skill[];
 
-  @OneToMany(() => ServiceArea, (area) => area.technician, { cascade: true })
+  @OneToMany(() => ServiceArea, (area) => area.technician, { eager: true })
   serviceAreas: ServiceArea[];
 
-  @OneToMany(() => Document, (doc) => doc.technician, { cascade: true })
+  @OneToMany(() => Document, (doc) => doc.technician, { eager: true })
   documents: Document[];
 }

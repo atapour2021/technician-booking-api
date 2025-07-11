@@ -19,17 +19,17 @@ export class UsersService {
     return this.userRepo.findOne({ where: { email } });
   }
 
-  findById(id: number): Promise<User | null> {
-    return this.userRepo.findOne({ where: { id } });
+  async findById(id: number): Promise<User | null> {
+    return await this.userRepo.findOne({ where: { id } });
   }
 
   async updateUser(id: number, data: Partial<User>) {
-    await this.userRepo.update({ id }, data);
+    return await this.userRepo.update({ id }, data);
   }
 
   async create(userData: Partial<User>): Promise<User> {
     const user = this.userRepo.create(userData);
-    return this.userRepo.save(user);
+    return await this.userRepo.save(user);
   }
 
   async findAllWithFilter(options: FilterUserDto) {
@@ -64,12 +64,12 @@ export class UsersService {
   }
 
   async findByPhone(phone: string): Promise<User | null> {
-    return this.userRepo.findOne({ where: { phone } });
+    return await this.userRepo.findOne({ where: { phone } });
   }
 
   async createUserByPhone(phone: string): Promise<User> {
     const user = this.userRepo.create({ phone });
-    return this.userRepo.save(user);
+    return await this.userRepo.save(user);
   }
 
   async findOrCreateByPhone(phone: string): Promise<User> {

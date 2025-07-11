@@ -1,61 +1,31 @@
-import { IsArray, IsOptional, IsString, ValidateNested } from 'class-validator';
-import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
-
-class SkillDto {
-  @ApiProperty()
-  @IsString()
-  title: string;
-}
-
-class AreaDto {
-  @ApiProperty()
-  @IsString()
-  city: string;
-
-  @ApiProperty()
-  @IsString()
-  district: string;
-}
-
-class DocumentDto {
-  @ApiProperty()
-  @IsString()
-  title: string;
-
-  @ApiProperty()
-  @IsString()
-  fileUrl: string;
-}
+import { Type } from 'class-transformer';
+import { IsArray, ValidateNested } from 'class-validator';
+import { CreateUserDto } from 'src/users/dto/user.dto';
+import { Document } from '../entity/document.entity';
+import { ServiceArea } from '../entity/service-area.entity';
+import { Skill } from '../entity/skill.entity';
 
 export class CreateTechnicianDto {
-  @ApiProperty()
-  @IsString()
-  fullName: string;
+  @ApiProperty({ type: CreateUserDto })
+  @Type(() => CreateUserDto)
+  user: CreateUserDto;
 
-  @ApiProperty()
-  @IsString()
-  phone: string;
-
-  @IsOptional()
-  @IsString()
-  avatarUrl?: string;
-
-  @ApiProperty()
+  @ApiProperty({ type: [Skill] })
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => SkillDto)
-  skills: SkillDto[];
+  @Type(() => Skill)
+  skills: Skill[];
 
-  @ApiProperty()
+  @ApiProperty({ type: [ServiceArea] })
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => AreaDto)
-  serviceAreas: AreaDto[];
+  @Type(() => ServiceArea)
+  serviceAreas: ServiceArea[];
 
-  @ApiProperty()
+  @ApiProperty({ type: [Document] })
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => DocumentDto)
-  documents: DocumentDto[];
+  @Type(() => Document)
+  documents: Document[];
 }
