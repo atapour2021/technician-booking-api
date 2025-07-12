@@ -9,6 +9,7 @@ import { ProfileModule } from './profile/profile.module';
 import { CategoryModule } from './category/category.module';
 import { OtpModule } from './otp/otp.module';
 import { TechniciansModule } from './technicians/technicians.module';
+import { WalletModule } from './wallet/wallet.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { TechniciansModule } from './technicians/technicians.module';
     CategoryModule,
     OtpModule,
     TechniciansModule,
+    WalletModule,
   ],
   controllers: [],
   providers: [],

@@ -1,4 +1,5 @@
 import { Technician } from 'src/technicians/entity/technician.entity';
+import { Wallet } from 'src/wallet/entity/wallet.entity';
 import {
   Column,
   CreateDateColumn,
@@ -61,4 +62,10 @@ export class User {
 
   @OneToOne(() => Technician, (technician) => technician.user)
   technician: Technician;
+
+  @OneToOne(() => Wallet, (wallet) => wallet.user, {
+    cascade: true,
+    eager: true,
+  })
+  wallet: Wallet;
 }
