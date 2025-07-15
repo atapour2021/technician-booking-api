@@ -43,7 +43,11 @@ export class WalletService {
     });
     if (!user) throw new NotFoundException('User not found');
     const wallet = this.walletRepo.create({ user });
-    return await this.walletRepo.save(wallet);
+    const walletData = await this.walletRepo.save(wallet);
+    user.wallet = walletData;
+    console.log('walletData', walletData);
+    await this.userRepo.update({ id: user.id }, user);
+    return walletData;
   }
 
   async deposit(userId: number, amount: number, description?: string) {
